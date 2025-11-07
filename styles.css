@@ -1,0 +1,159 @@
+/* styles.css — Dark gallery for mini-games */
+:root{
+  --bg: #0b0f13;
+  --panel: #0f1620;
+  --muted: #9aa6b2;
+  --accent: #7c5adb;
+  --accent-2: #5a3d8e;
+  --tile-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  --glass: rgba(255,255,255,0.03);
+  --radius: 12px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(92,67,175,0.12), transparent),
+              radial-gradient(900px 400px at 90% 90%, rgba(88,141,241,0.06), transparent),
+              var(--bg);
+  color:#e6eef8;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.4;
+  padding:32px 12px;
+}
+
+/* Layout container */
+.container{max-width:1100px;margin:0 auto;padding:0 18px}
+
+/* Header */
+.site-header{
+  margin-bottom:22px;
+}
+.header-inner{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.site-title{margin:0;font-size:28px;color:var(--accent)}
+.site-sub{margin:0;color:var(--muted);font-size:13px}
+
+/* Grid */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap:18px;
+  margin-top:20px;
+}
+
+/* Tile */
+.tile{
+  display:block;
+  background: var(--tile-bg);
+  border-radius: var(--radius);
+  overflow:hidden;
+  text-decoration:none;
+  color:inherit;
+  box-shadow: 0 6px 20px rgba(7,10,14,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+  transition: transform .18s ease, box-shadow .18s ease;
+  border: 1px solid rgba(255,255,255,0.03);
+  backdrop-filter: blur(6px);
+  outline: none;
+}
+.tile:focus,
+.tile:hover{
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(9,11,20,0.7), 0 3px 12px rgba(92,67,175,0.12);
+}
+
+/* Thumbnail image */
+.thumb{
+  display:block;
+  width:100%;
+  height:140px;
+  object-fit:cover;
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1));
+}
+
+/* Info area */
+.tile-info{padding:14px}
+.tile-title{margin:0;font-size:18px;color:#fff}
+.tile-desc{margin:6px 0 0;color:var(--muted);font-size:13px;}
+
+/* Footer */
+.site-footer{margin-top:34px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.03);color:var(--muted);font-size:13px;text-align:center}
+
+/* Responsive adjustments */
+@media (max-width:520px){
+  .thumb{height:110px}
+  .site-title{font-size:20px}
+  body{padding:20px 10px}
+}
+
+/* Small helper: keyboard focus ring */
+.tile:focus-visible{
+  box-shadow: 0 0 0 4px rgba(124,90,219,0.16), 0 12px 30px rgba(0,0,0,0.6);
+  transform: translateY(-6px);
+}
+
+/* Placeholder style if thumbnail missing */
+.thumb[alt=""]{
+  background: linear-gradient(135deg,#222 0%, #111 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.connect-section {
+  text-align: center;
+  margin: 40px 0;
+  background: #1b1b1b;
+  color: #eee;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+}
+
+.connect-buttons {
+  margin: 15px 0;
+}
+
+.connect-buttons button {
+  background: #5a3d8e;
+  border: none;
+  color: #fff;
+  font-size: 1.1em;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.connect-buttons button:hover {
+  background: #7d5ab7;
+  transform: scale(1.05);
+}
+
+.instructions {
+  margin-top: 20px;
+  font-size: 1.05em;
+  color: #ddd;
+  text-align: center;
+}
+
+.instructions code {
+  display: inline-block;
+  background: #2b2b2b;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: #00ff88;
+  margin-top: 6px;
+}
+
+.instructions ol {
+  text-align: left;
+  margin: 10px auto;
+  max-width: 400px;
+}
+

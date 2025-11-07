@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sensor + Voice Demo</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #game { width: 100%; height: 300px; background: #eee; display:block; margin-bottom:10px; }
+    #log { height:140px; overflow:auto; border:1px solid #ccc; padding:8px; background:#fafafa;}
+    button { padding:10px 14px; margin-right:8px; }
+  </style>
+</head>
+<body>
+  <h2>Demo Sensores + Voz (Android Samsung)</h2>
+  <canvas id="game" width="600" height="300"></canvas><br>
+  <button id="start">Ativar sensores</button>
+  <button id="stop">Parar</button>
+  <div id="log"></div>
+
+  <script>
+    const startBtn = document.getElementById('start');
+    const stopBtn = document.getElementById('stop');
+    const log = document.getElementById('log');
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    let listening = false;
+    let sensorsActive = false;
+
+    function addLog(s) {
+      const p = document.createElement('div');
+      p.textContent = s;
+      log.appendChild(p);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function drawBall(x,y) {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.beginPath();
+      ctx.arc(canvas.width/2 + x, canvas.height/2 + y, 20, 0, Math.PI*2);
+      ctx.fillStyle = sensorsActive ? '#4477cc' : '#aaa';
+      ctx.fill();
+    }
+
+    function handleOrientation(e) {
+      if (!sensorsActive) return; // ignore tilt if inactive
+      const a = e.alpha || 0;
+      const b = e.beta  || 0;
+      const g = e.gamma || 0;
+      addLog(`ori α:${a.toFixed(1)} β:${b.toFixed(1)} γ:${g.toFixed(1)}`);
+      const x = g * 2;
+      const y = b * 2;
+      drawBall(x, y);
+    }
+
+    function handleMotion(e) {
+      if (!sensorsActive) return;
+      const acc = e.accelerationIncludingGravity || e.acceleration;
+      if (!acc) return;
+      addLog(`acc x:${(acc.x||0).toFixed(2)} y:${(acc.y||0).toFixed(2)} z:${(acc.z||0).toFixed(2)}`);
+    }
+
+    async function startSensors() {
+      if (listening) return;
+      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+        try {
+          const p = await DeviceMotionEvent.requestPermission();
+          if (p !== 'granted') {
+            addLog('Permissão negada para DeviceMotion.');
+            return;
+          }
+        } catch (err) {
+          addLog('Erro ao pedir permissão: ' + err);
+        }
+      }
+      window.addEventListener('deviceorientation', handleOrientation);
+      window.addEventListener('devicemotion', handleMotion);
+      listening = true;
+      sensorsActive = true;
+      addLog('Sensores ativados. Inclina o telemóvel.');
+    }
+
+    function stopSensors() {
+      if (!listening) return;
+      window.removeEventListener('deviceorientation', handleOrientation);
+      window.removeEventListener('devicemotion', handleMotion);
+      listening = false;
+      sensorsActive = false;
+      drawBall(0,0);
+      addLog('Sensores parados.');
+    }
+
+    startBtn.onclick = startSensors;
+    stopBtn.onclick = stopSensors;
+
+    // --- VOICE CONTROL ADDITION ---
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+
+      recognition.onresult = (event) => {
+        const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+        addLog('🎙️ Ouvido: ' + command);
+
+        if (command.includes('start')) {
+        addLog('🟢 Comando de voz: START → ativar sensores');
+        startSensors(); // actually call the same function as button
+      }
+
+      if (command.includes('stop')) {
+        addLog('🔴 Comando de voz: STOP → parar sensores');
+        stopSensors(); // same as button
+      }
+
+      };
+
+      recognition.onerror = (e) => addLog('Erro de reconhecimento: ' + e.error);
+      recognition.start();
+      addLog('Reconhecimento de voz iniciado...');
+    } else {
+      addLog('⚠️ Reconhecimento de voz não suportado neste navegador.');
+    }
+    // --- END VOICE CONTROL ---
+
+    drawBall(0,0);
+  </script>
+</body>
+</html>

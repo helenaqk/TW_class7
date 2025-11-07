@@ -1,0 +1,27 @@
+{
+  "name": "tw_aula7",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helenaqk/TW_aula7.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/helenaqk/TW_aula7/issues"
+  },
+  "homepage": "https://github.com/helenaqk/TW_aula7#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "qrcode": "^1.5.4",
+    "ws": "^8.18.3"
+  }
+}

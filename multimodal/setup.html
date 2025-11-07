@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Multimodal Setup</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="../styles.css">
+  <style>
+    body { background:#0d1117; color:#e6edf3; font-family:Arial; padding:20px; }
+    h1, h2 { color:#58a6ff; }
+    .step { margin-bottom: 1.8em; padding:15px; background:#161b22; border-radius:8px; }
+    code, pre { background:#21262d; color:#79c0ff; padding:4px 6px; border-radius:4px; }
+    input { padding:8px; width:200px; margin-right:8px; border-radius:5px; border:none; }
+    button { padding:8px 14px; border:none; border-radius:5px; background:#238636; color:white; cursor:pointer; }
+    button:hover { background:#2ea043; }
+    #serverStatus { margin-top:6px; font-weight:bold; }
+    #qrSection { display:none; flex-direction:column; align-items:center; gap:10px; margin-top:15px; }
+    canvas { background:white; padding:10px; border-radius:8px; }
+    .success { color:#2ea043; }
+    .warning { color:#f85149; }
+    a { color:#58a6ff; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+  </style>
+</head>
+<body>
+  <h1>🎮 Multimodal Setup</h1>
+  <p>Follow these steps to connect your <b>computer</b> and <b>phone</b> before playing the game.</p>
+
+  <!-- Step 1 -->
+  <div class="step">
+    <h2>1️⃣ Find your local IP address</h2>
+    <ol>
+      <li>Open the <b>Terminal</b> (or PowerShell on Windows).</li>
+      <li>Type: <pre>ipconfig</pre></li>
+      <li>Look for the line <b>IPv4 Address</b> (example: <code>192.168.1.23</code>).</li>
+    </ol>
+    <p>Paste your IP here:</p>
+    <input type="text" id="ipInput" placeholder="192.168.x.x">
+    <button id="checkServer">Confirm</button>
+    <p id="serverStatus"></p>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <h2>2️⃣ Start the Node.js server</h2>
+    <ol>
+      <li>Open <b>VS Code</b> inside your project folder.</li>
+      <li>Run in the terminal: <pre>node server.js</pre></li>
+      <li>You should see: <code>Server running at https://localhost:3000</code></li>
+    </ol>
+    <p>If you get a PowerShell permission error, run:</p>
+    <pre>Set-ExecutionPolicy RemoteSigned</pre>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step">
+    <h2>3️⃣ Connect your phone</h2>
+    <p>Make sure your <b>computer and phone are on the same Wi-Fi network</b>.</p>
+    <div id="qrSection">
+      <p>📱 Open this link in your phone’s browser:</p>
+      <code id="controllerUrl"></code>
+      <canvas id="qrCanvas"></canvas>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step">
+    <h2>4️⃣ Launch the game</h2>
+    <p>Once the server is running and the phone is connected, open the game on your computer:</p>
+    <a id="gameLink" href="#" target="_blank">▶️ Open Game</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.0/build/qrcode.min.js"></script>
+  <script>
+    const ipInput = document.getElementById("ipInput");
+    const checkBtn = document.getElementById("checkServer");
+    const serverStatus = document.getElementById("serverStatus");
+    const qrSection = document.getElementById("qrSection");
+    const controllerUrl = document.getElementById("controllerUrl");
+    const gameLink = document.getElementById("gameLink");
+
+    checkBtn.onclick = () => {
+      const ip = ipInput.value.trim();
+      if (!ip) return alert("Please enter your IPv4 address.");
+
+      const baseUrl = `https://${ip}:3000`; // ✅ now using HTTPS
+      const ctrlUrl = `${baseUrl}/multimodal/controller.html`;
+
+      // Always show QR + link
+      controllerUrl.textContent = ctrlUrl;
+      qrSection.style.display = "flex";
+      gameLink.href = `${baseUrl}/multimodal/game.html`;
+
+      // Try contacting the server
+      fetch(baseUrl, { mode: "no-cors" })
+    .then(() => {
+        serverStatus.textContent = "✅ Server seems to be running!";
+        serverStatus.className = "success";
+    })
+    .catch(() => {
+        serverStatus.textContent = "⚠️ Could not verify (this may happen with HTTPS). If you can open the game link, it's fine.";
+        serverStatus.className = "warning";
+    });
+
+      // Generate QR
+      QRCode.toCanvas(document.getElementById("qrCanvas"), ctrlUrl, { width: 180 });
+    };
+  </script>
+</body>
+</html>
