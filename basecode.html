@@ -1,132 +1,243 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sensor + Voice Demo</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌐 Browser Sensor Playground</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    #game { width: 100%; height: 300px; background: #eee; display:block; margin-bottom:10px; }
-    #log { height:140px; overflow:auto; border:1px solid #ccc; padding:8px; background:#fafafa;}
-    button { padding:10px 14px; margin-right:8px; }
+    body {
+      font-family: sans-serif;
+      background: #111;
+      color: #0f0;
+      padding: 1.5rem;
+    }
+    h1, h2 {
+      color: #00ff99;
+    }
+    button {
+      padding: 0.6rem 1rem;
+      margin: 0.3rem;
+      font-size: 1rem;
+      background: #333;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0f0;
+      color: #111;
+    }
+    .output {
+      background: #222;
+      padding: 0.7rem;
+      border-radius: 8px;
+      font-family: monospace;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
 <body>
-  <h2>Demo Sensores + Voz (Android Samsung)</h2>
-  <canvas id="game" width="600" height="300"></canvas><br>
-  <button id="start">Ativar sensores</button>
-  <button id="stop">Parar</button>
-  <div id="log"></div>
+  <h1>🌐 Browser Sensor Playground</h1>
+  <p>Click the buttons below to enable and visualize different sensors.</p>
+
+  <hr>
+
+  <!-- Device Motion -->
+  <h2>📱 Accelerometer (DeviceMotionEvent)</h2>
+  <button id="startMotion">Start Motion Sensor</button>
+  <div id="motionOutput" class="output">Not started.</div>
+
+  <hr>
+
+  <!-- Device Orientation -->
+  <h2>🧭 Orientation (DeviceOrientationEvent)</h2>
+  <button id="startOrientation">Start Orientation Sensor</button>
+  <div id="orientationOutput" class="output">Not started.</div>
+
+  <hr>
+
+  <!-- Generic Sensor API -->
+  <h2>🧩 Generic Sensor API (Accelerometer)</h2>
+  <button id="startGeneric">Start Generic Accelerometer</button>
+  <div id="genericOutput" class="output">Not started.</div>
+
+  <hr>
+
+  <!-- Touch Input -->
+  <h2>👆 Touch Input</h2>
+  <p>Touch or drag your finger on the screen.</p>
+  <div id="touchOutput" class="output">Waiting for touch...</div>
+
+  <hr>
+
+  <!-- Voice Input -->
+  <h2>🎤 Web Speech API</h2>
+  <button id="startVoice">Start Voice Recognition</button>
+  <div id="voiceOutput" class="output">Not started.</div>
+
+  <hr>
+
+  <!-- Geolocation -->
+  <h2>📍 Geolocation</h2>
+  <button id="getLocation">Get My Location</button>
+  <div id="geoOutput" class="output">Not started.</div>
+
+  <hr>
+
+  <!-- Ambient Light -->
+  <h2>💡 Ambient Light Sensor</h2>
+  <button id="startLight">Start Light Sensor</button>
+  <div id="lightOutput" class="output">Not started.</div>
 
   <script>
-    const startBtn = document.getElementById('start');
-    const stopBtn = document.getElementById('stop');
-    const log = document.getElementById('log');
-    const canvas = document.getElementById('game');
-    const ctx = canvas.getContext('2d');
+    // --- Device Motion ---
+    document.getElementById("startMotion").onclick = async () => {
+      const output = document.getElementById("motionOutput");
 
-    let listening = false;
-    let sensorsActive = false;
-
-    function addLog(s) {
-      const p = document.createElement('div');
-      p.textContent = s;
-      log.appendChild(p);
-      log.scrollTop = log.scrollHeight;
-    }
-
-    function drawBall(x,y) {
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.beginPath();
-      ctx.arc(canvas.width/2 + x, canvas.height/2 + y, 20, 0, Math.PI*2);
-      ctx.fillStyle = sensorsActive ? '#4477cc' : '#aaa';
-      ctx.fill();
-    }
-
-    function handleOrientation(e) {
-      if (!sensorsActive) return; // ignore tilt if inactive
-      const a = e.alpha || 0;
-      const b = e.beta  || 0;
-      const g = e.gamma || 0;
-      addLog(`ori α:${a.toFixed(1)} β:${b.toFixed(1)} γ:${g.toFixed(1)}`);
-      const x = g * 2;
-      const y = b * 2;
-      drawBall(x, y);
-    }
-
-    function handleMotion(e) {
-      if (!sensorsActive) return;
-      const acc = e.accelerationIncludingGravity || e.acceleration;
-      if (!acc) return;
-      addLog(`acc x:${(acc.x||0).toFixed(2)} y:${(acc.y||0).toFixed(2)} z:${(acc.z||0).toFixed(2)}`);
-    }
-
-    async function startSensors() {
-      if (listening) return;
-      if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
-        try {
-          const p = await DeviceMotionEvent.requestPermission();
-          if (p !== 'granted') {
-            addLog('Permissão negada para DeviceMotion.');
-            return;
-          }
-        } catch (err) {
-          addLog('Erro ao pedir permissão: ' + err);
+      // iOS requires permission from user gesture
+      if (typeof DeviceMotionEvent.requestPermission === "function") {
+        const response = await DeviceMotionEvent.requestPermission();
+        if (response !== "granted") {
+          output.textContent = "Permission denied.";
+          return;
         }
       }
-      window.addEventListener('deviceorientation', handleOrientation);
-      window.addEventListener('devicemotion', handleMotion);
-      listening = true;
-      sensorsActive = true;
-      addLog('Sensores ativados. Inclina o telemóvel.');
-    }
 
-    function stopSensors() {
-      if (!listening) return;
-      window.removeEventListener('deviceorientation', handleOrientation);
-      window.removeEventListener('devicemotion', handleMotion);
-      listening = false;
-      sensorsActive = false;
-      drawBall(0,0);
-      addLog('Sensores parados.');
-    }
+      window.addEventListener("devicemotion", (event) => {
+        const acc = event.accelerationIncludingGravity;
+        const rot = event.rotationRate;
+        output.innerHTML = `
+          Acceleration (m/s²):<br>
+          x: ${acc?.x?.toFixed(2)} | y: ${acc?.y?.toFixed(2)} | z: ${acc?.z?.toFixed(2)}<br>
+          Rotation (°/s):<br>
+          alpha: ${rot?.alpha?.toFixed(2)} | beta: ${rot?.beta?.toFixed(2)} | gamma: ${rot?.gamma?.toFixed(2)}
+        `;
+      });
+    };
 
-    startBtn.onclick = startSensors;
-    stopBtn.onclick = stopSensors;
+    // --- Device Orientation ---
+    document.getElementById("startOrientation").onclick = async () => {
+      const output = document.getElementById("orientationOutput");
 
-    // --- VOICE CONTROL ADDITION ---
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognition = new SpeechRecognition();
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        const response = await DeviceOrientationEvent.requestPermission();
+        if (response !== "granted") {
+          output.textContent = "Permission denied.";
+          return;
+        }
+      }
+
+      window.addEventListener("deviceorientation", (event) => {
+        output.innerHTML = `
+          alpha (compass): ${event.alpha?.toFixed(2)}°<br>
+          beta (tilt front/back): ${event.beta?.toFixed(2)}°<br>
+          gamma (tilt left/right): ${event.gamma?.toFixed(2)}°
+        `;
+      });
+    };
+
+    // --- Generic Sensor API ---
+    document.getElementById("startGeneric").onclick = () => {
+      const output = document.getElementById("genericOutput");
+
+      try {
+        const sensor = new Accelerometer({ frequency: 30 });
+        sensor.addEventListener("reading", () => {
+          output.innerHTML = `
+            Accelerometer values:<br>
+            x: ${sensor.x.toFixed(2)} | y: ${sensor.y.toFixed(2)} | z: ${sensor.z.toFixed(2)}
+          `;
+        });
+        sensor.addEventListener("error", (e) => {
+          output.textContent = `Sensor error: ${e.error.name}`;
+        });
+        sensor.start();
+      } catch (e) {
+        output.textContent = `Generic Sensor API not supported: ${e.message}`;
+      }
+    };
+
+    // --- Touch Input ---
+    const touchOutput = document.getElementById("touchOutput");
+    window.addEventListener("touchstart", (e) => {
+      const t = e.touches[0];
+      touchOutput.textContent = `Touch start → x: ${t.clientX}, y: ${t.clientY}`;
+    });
+    window.addEventListener("touchmove", (e) => {
+      const t = e.touches[0];
+      touchOutput.textContent = `Touch move → x: ${t.clientX}, y: ${t.clientY}`;
+    });
+    window.addEventListener("touchend", () => {
+      touchOutput.textContent = `Touch end`;
+    });
+
+    // --- Voice Input ---
+    document.getElementById("startVoice").onclick = () => {
+      const output = document.getElementById("voiceOutput");
+
+      if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+        output.textContent = "Speech recognition not supported in this browser.";
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
       recognition.continuous = true;
-      recognition.lang = 'en-US';
       recognition.interimResults = false;
 
       recognition.onresult = (event) => {
-        const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
-        addLog('🎙️ Ouvido: ' + command);
-
-        if (command.includes('start')) {
-        addLog('🟢 Comando de voz: START → ativar sensores');
-        startSensors(); // actually call the same function as button
-      }
-
-      if (command.includes('stop')) {
-        addLog('🔴 Comando de voz: STOP → parar sensores');
-        stopSensors(); // same as button
-      }
-
+        const transcript = event.results[event.results.length - 1][0].transcript.trim();
+        output.textContent = `Heard: "${transcript}"`;
       };
 
-      recognition.onerror = (e) => addLog('Erro de reconhecimento: ' + e.error);
-      recognition.start();
-      addLog('Reconhecimento de voz iniciado...');
-    } else {
-      addLog('⚠️ Reconhecimento de voz não suportado neste navegador.');
-    }
-    // --- END VOICE CONTROL ---
+      recognition.onerror = (err) => {
+        output.textContent = `Speech error: ${err.error}`;
+      };
 
-    drawBall(0,0);
+      recognition.start();
+      output.textContent = "Listening... speak into the mic 🎤";
+    };
+
+    // --- Geolocation ---
+    document.getElementById("getLocation").onclick = () => {
+      const output = document.getElementById("geoOutput");
+
+      if (!("geolocation" in navigator)) {
+        output.textContent = "Geolocation not supported.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          output.innerHTML = `Latitude: ${latitude.toFixed(6)}<br>
+                              Longitude: ${longitude.toFixed(6)}<br>
+                              Accuracy: ±${accuracy} m`;
+        },
+        (err) => {
+          output.textContent = `Error: ${err.message}`;
+        }
+      );
+    };
+
+    // --- Ambient Light Sensor ---
+    document.getElementById("startLight").onclick = () => {
+      const output = document.getElementById("lightOutput");
+
+      try {
+        const sensor = new AmbientLightSensor();
+        sensor.addEventListener("reading", () => {
+          output.textContent = `Light level: ${sensor.illuminance.toFixed(2)} lux`;
+        });
+        sensor.addEventListener("error", (e) => {
+          output.textContent = `Light sensor error: ${e.error.name}`;
+        });
+        sensor.start();
+      } catch (e) {
+        output.textContent = `AmbientLightSensor not supported: ${e.message}`;
+      }
+    };
   </script>
 </body>
 </html>
