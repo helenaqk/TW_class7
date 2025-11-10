@@ -26,9 +26,21 @@
   <h1>🎮 Multimodal Setup</h1>
   <p>Follow these steps to connect your <b>computer</b> and <b>phone</b> before playing the game.</p>
 
-  <!-- Step 1 -->
+    <!-- Step 1 -->
   <div class="step">
-    <h2>1️⃣ Find your local IP address</h2>
+    <h2>1️⃣Start the Node.js server</h2>
+    <ol>
+      <li>Open <b>VS Code</b> inside your project folder.</li>
+      <li>Run in the terminal: <pre>node server.js</pre></li>
+      <li>You should see: <code>Server running at https://localhost:3000</code></li>
+    </ol>
+    <p>If you get a PowerShell permission error, run:</p>
+    <pre>Set-ExecutionPolicy RemoteSigned</pre>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step">
+    <h2>2️⃣ Find your local IP address</h2>
     <ol>
       <li>Open the <b>Terminal</b> (or PowerShell on Windows).</li>
       <li>Type: <pre>ipconfig</pre></li>
@@ -38,18 +50,6 @@
     <input type="text" id="ipInput" placeholder="192.168.x.x">
     <button id="checkServer">Confirm</button>
     <p id="serverStatus"></p>
-  </div>
-
-  <!-- Step 2 -->
-  <div class="step">
-    <h2>2️⃣ Start the Node.js server</h2>
-    <ol>
-      <li>Open <b>VS Code</b> inside your project folder.</li>
-      <li>Run in the terminal: <pre>node server.js</pre></li>
-      <li>You should see: <code>Server running at https://localhost:3000</code></li>
-    </ol>
-    <p>If you get a PowerShell permission error, run:</p>
-    <pre>Set-ExecutionPolicy RemoteSigned</pre>
   </div>
 
   <!-- Step 3 -->
