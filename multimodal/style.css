@@ -25,3 +25,23 @@ canvas {
   border: 2px solid #444;
   border-radius: 10px;
 }
+
+/* Pong */
+
+#warning {
+    display: none;
+}
+
+@media (orientation: portrait) {
+    #pong, #info {
+        display: none;
+    }
+
+    #warning {
+        display: block;
+        color: red;
+        text-align: center;
+        font-size: 24px;
+        margin-top: 40vh;
+    }
+}

@@ -1,13 +1,13 @@
 class Game {
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
-        canvas.width = window.innerWidth*0.80;
-        canvas.height = window.innerHeight*0.80;
+        canvas.height = window.innerWidth*0.80;
+        canvas.width = window.innerHeight*0.80;
         this.width = canvas.width;
         this.height = canvas.height;
 
         // Ball
-        this.radius = 0.025*this.height;
+        this.radius = 0.03*this.height;
         this.ballX = this.width / 2;
         this.ballY = this.height / 2;
         this.direction = [-1, 1];
@@ -19,7 +19,7 @@ class Game {
         this.ballVelY = this.dir * 6 * Math.sin(this.rad);
 
         //  Paddles
-        this.paddleSpeed = 0.01*this.height;
+        this.paddleSpeed = 0.0125*this.height;
         this.paddleWidth = 20;
         this.paddleHeight = 0.2*this.height;
         this.leftY = this.rightY = this.height / 2 - this.paddleHeight / 2;
@@ -43,9 +43,9 @@ class Game {
 
     update() {
         // Left paddle movement
-        if (this.keys["w"] || tiltX > 10) {
+        if (this.keys["w"] || window.tiltX > 10) {
             this.leftVel = -this.paddleSpeed;
-        } else if (this.keys["s"] || tiltX < -35){
+        } else if (this.keys["s"] || window.tiltX < -35){
             this.leftVel = this.paddleSpeed;
         } else {
             this.leftVel = 0;
@@ -55,9 +55,9 @@ class Game {
         const paddleCenter = this.rightY + this.paddleHeight / 2;
         const ballCenter = this.ballY;
 
-        if (ballCenter > paddleCenter + 25) {
+        if (ballCenter > paddleCenter + 15) {
             this.rightVel = this.paddleSpeed;
-        } else if (ballCenter < paddleCenter - 25) {
+        } else if (ballCenter < paddleCenter - 15) {
             this.rightVel = - this.paddleSpeed;
         } else {
             this.rightVel = 0;
@@ -166,7 +166,6 @@ class Game {
 
 const canvas = document.getElementById("pong");
 const game = new Game(canvas);
-let started = false;
 const statusEl = document.getElementById("status");
 const startBtn = document.getElementById("startBtn");
 
@@ -178,11 +177,6 @@ function loop() {
 }
 
 startBtn.addEventListener("click", () => {
-        started = true;
+        requestAnimationFrame(loop);
         enableOrientation();
     });
-
-while (started) {
-    loop();
-}
-

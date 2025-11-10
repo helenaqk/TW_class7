@@ -1,7 +1,7 @@
 window.handleOrientation = function(event) {
       // gamma: esquerda/direita, beta: frente/trás
-      tiltX = event.gamma || 0;
-      tiltY = event.beta || 0;
+      window.tiltX = event.gamma || 0;
+      window.tiltY = event.beta || 0;
     }
 
 window.enableOrientation = async function() {
