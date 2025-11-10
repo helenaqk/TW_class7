@@ -2,11 +2,11 @@ class Game {
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
         if (window.innerWidth < window.innerHeight) {
-            canvas.height = window.innerWidth*0.80;
-            canvas.width = window.innerHeight*0.85;
+            canvas.height = window.screen.width*0.70;
+            canvas.width = window.screen.height*0.80;
         } else if (window.innerWidth > window.innerHeight){
-            canvas.width = window.innerWidth*0.85;
-            canvas.height = window.innerHeight*0.80;
+            canvas.width = window.screen.width*0.80;
+            canvas.height = window.screen.height*0.70;
         }
 
         this.width = canvas.width;
@@ -50,9 +50,9 @@ class Game {
 
     update() {
         // Left paddle movement
-        if (this.keys["w"] || window.tiltX > window.X + 10) {
+        if (this.keys["w"] || window.tiltX > window.X + 5) {
             this.leftVel = -this.paddleSpeed;
-        } else if (this.keys["s"] || window.tiltX < window.X -10){
+        } else if (this.keys["s"] || window.tiltX < window.X - 10){
             this.leftVel = this.paddleSpeed;
         } else {
             this.leftVel = 0;
