@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,9 +12,12 @@
       color: #0f0;
       padding: 1.5rem;
     }
-    h1, h2 {
+
+    h1,
+    h2 {
       color: #00ff99;
     }
+
     button {
       padding: 0.6rem 1rem;
       margin: 0.3rem;
@@ -24,10 +28,12 @@
       border-radius: 6px;
       cursor: pointer;
     }
+
     button:hover {
       background: #0f0;
       color: #111;
     }
+
     .output {
       background: #222;
       padding: 0.7rem;
@@ -37,6 +43,7 @@
     }
   </style>
 </head>
+
 <body>
   <h1>🌐 Browser Sensor Playground</h1>
   <p>Click the buttons below to enable and visualize different sensors.</p>
@@ -176,7 +183,8 @@
     document.getElementById("startVoice").onclick = () => {
       const output = document.getElementById("voiceOutput");
 
-      if (!("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
         output.textContent = "Speech recognition not supported in this browser.";
         return;
       }
@@ -240,4 +248,5 @@
     };
   </script>
 </body>
+
 </html>
