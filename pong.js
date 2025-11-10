@@ -1,12 +1,12 @@
 class Game {
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
-        if (window.innerWidth < window.innerHeight) {
-            canvas.height = window.screen.width*0.70;
+        if (window.screen.width < window.screen.height) {
+            canvas.height = window.screen.width*0.80;
             canvas.width = window.screen.height*0.80;
-        } else if (window.innerWidth > window.innerHeight){
+        } else if (window.screen.width > window.screen.height){
             canvas.width = window.screen.width*0.80;
-            canvas.height = window.screen.height*0.70;
+            canvas.height = window.screen.height*0.80;
         }
 
         this.width = canvas.width;
