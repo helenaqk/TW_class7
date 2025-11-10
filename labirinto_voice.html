@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>16x16 Maze</title>
+    <style>
+        body {
+            background: #121212;
+            color: #fff;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        #maze {
+            display: grid;
+            grid-template-columns: repeat(16, 30px);
+            grid-template-rows: repeat(16, 30px);
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            background: #222;
+        }
+
+        .wall {
+            background: #555;
+        }
+
+        .player {
+            background: #0f0;
+        }
+
+        .exit {
+            background: #f00;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #speech-box {
+            border-radius: 5px;
+            border: 2px solid white;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🗣️ Speech-Controlled Maze 🎤</h1>
+    <div id="maze"></div>
+    <p>Control the green token. Try to say the number of places you want to move followed by the direction (eg "4 RIGHT").</p>
+    <div id="speech-box"><strong>. . .</strong></div>
+    <script>
+        const rows = 16;
+        const cols = 16;
+
+        const mazeLayout = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+            [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0],
+            [0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1],
+            [0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+            [0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+            [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
+            [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+            [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0],
+            [0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0],
+            [0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+            [0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0],
+        ];
+        
+        const directionMap = {
+            'right': [1, 0],
+            'left': [-1, 0],
+            'up': [0, -1],
+            'down': [0, 1]
+        };
+
+        let playerPos = { x: 0, y: 0 };
+        const exitPos = { x: 15, y: 15 };
+
+        const mazeEl = document.getElementById('maze');
+
+        function renderMaze() {
+            mazeEl.innerHTML = '';
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    if (mazeLayout[y][x] === 1) cell.classList.add('wall');
+                    if (playerPos.x === x && playerPos.y === y) cell.classList.add('player');
+                    if (exitPos.x === x && exitPos.y === y) cell.classList.add('exit');
+                    mazeEl.appendChild(cell);
+                }
+            }
+        }
+
+        function movePlayer(dx, dy) {
+            const newX = playerPos.x + dx;
+            const newY = playerPos.y + dy;
+            if (newX >= 0 && newX < cols && newY >= 0 && newY < rows && mazeLayout[newY][newX] === 0) {
+                playerPos.x = newX;
+                playerPos.y = newY;
+                renderMaze();
+                checkWin();
+            }
+        }
+
+        function checkWin() {
+            if (playerPos.x === exitPos.x && playerPos.y === exitPos.y) {
+                playerPos.x = 0;
+                playerPos.y = 0;
+                renderMaze();
+                alert('You reached the exit! 🎉');
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            switch (e.key.toLowerCase()) {
+                case 'w': movePlayer(0, -1); break;
+                case 'a': movePlayer(-1, 0); break;
+                case 's': break;
+                case 'd': movePlayer(1, 0); break;
+            }
+        });
+
+        function handleVoiceMove(transcript) {
+            transcript = transcript.toLowerCase().trim();
+            transcript = transcript.replace(/\bto\s+(right|left|up|down)\b/g, '2 $1'); // make it easier to understand "two"
+            transcript = transcript.replace(/\bfor\b/g, '4'); // make it easier to understand "four"
+            const match = transcript.match(/(\d+)?\s*(right|left|up|down)/); // try to find 'number' and then direction'
+            if (!match) { // if no number is mentioned only move 1
+                if (transcript.includes('RIGHT')) {
+                    movePlayer(1, 0);
+                } else if (transcript.includes('LEFT')) {
+                    movePlayer(-1, 0);
+                } else if (transcript.includes('UP')) {
+                    movePlayer(0, -1);
+                } else if (transcript.includes('DOWN')) {
+                    movePlayer(0, 1);
+                }
+                return;
+            }
+
+            const count = parseInt(match[1]) || 1
+            const direction = match[2];
+
+            const [dx, dy] = directionMap[direction];
+
+            for (let i = 0; i < count; i++) {
+                movePlayer(dx, dy);
+            }
+        }
+
+        const output = document.getElementById("speech-box");
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[event.results.length - 1][0].transcript.trim().toUpperCase();;
+                output.textContent = `Heard: "${transcript}"`;
+
+                handleVoiceMove(transcript);
+            };
+
+            recognition.onerror = (err) => {
+                output.textContent = `Speech error: ${err.error}`;
+            };
+
+            recognition.start();
+            output.textContent = "Listening... speak into the mic 🎤";
+        } else {
+            output.textContent = "Speech recognition not supported in this browser.";
+        }
+
+        renderMaze();
+    </script>
+</body>
+
+</html>

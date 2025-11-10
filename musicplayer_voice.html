@@ -7,7 +7,6 @@
     <title>Speech-Controlled Music Test</title>
     <link rel="stylesheet" href="multimodal/style.css">
     <style>
-        /* Additional styling for grid layout */
         .song-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -71,13 +70,13 @@
 
     <audio id="player" controls style="width:100%; display:none;"></audio>
 
-    <div id="speech-box">🎤 Say "play", "pause", "fastforward", or "rewind" to control the song.</div>
+    <div id="speech-box">🎤 Say "play", "pause", "fastforward", or "rewind" to control the song, and "up" or "down" to control volume.</div>
 
     <script>
         const player = document.getElementById('player');
         let currentAudio = null;
 
-        // Song selection
+        // select song
         document.querySelectorAll('.song-button img, .song-button button').forEach(el => {
             el.addEventListener('click', () => {
                 const audioSrc = el.dataset.audio || el.parentElement.querySelector('img').dataset.audio;
@@ -88,37 +87,41 @@
             });
         });
 
-        // Web Speech API
-        const speechBox = document.getElementById('speech-box');
+        const output = document.getElementById("speech-box");
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
-            const recognition = new SpeechRecognition();
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
             recognition.continuous = true;
-            recognition.lang = 'en-US';
-            recognition.start();
+            recognition.interimResults = false;
 
             recognition.onresult = (event) => {
-                const lastResult = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-                speechBox.textContent = `Heard: "${lastResult}"`;
+                const transcript = event.results[event.results.length - 1][0].transcript.trim().toUpperCase();;
+                output.textContent = `Heard: "${transcript}"`;
 
-                if (!player.src) return;
-
-                if (lastResult.includes('play')) {
+                if (transcript.includes('PLAY')) {
                     player.play();
-                } else if (lastResult.includes('pause')) {
+                } else if (transcript.includes('PAUSE')) {
                     player.pause();
-                } else if (lastResult.includes('fastforward')) {
-                    player.currentTime = Math.min(player.currentTime + 10, player.duration || player.currentTime);
-                } else if (lastResult.includes('rewind')) {
+                } else if (transcript.includes('SKIP')) {
+                    player.currentTime = Math.min(player.currentTime + 10, player.duration || Infinity);
+                } else if (transcript.includes('REWIND')) {
                     player.currentTime = Math.max(player.currentTime - 10, 0);
+                } else if (transcript.includes('UP')) {
+                    player.volume = Math.max(player.volume + 0.2, 0);
+                } else if (transcript.includes('DOWN')) {
+                    player.volume = Math.max(player.volume - 0.2, 0);
                 }
             };
 
-            recognition.onerror = (e) => {
-                speechBox.textContent = 'Speech recognition error: ' + e.error;
+            recognition.onerror = (err) => {
+                output.textContent = `Speech error: ${err.error}`;
             };
+
+            recognition.start();
+            output.textContent = "Listening... speak into the mic 🎤";
         } else {
-            speechBox.textContent = '⚠️ Your browser does not support Web Speech API';
+            output.textContent = "Speech recognition not supported in this browser.";
         }
     </script>
 </body>
