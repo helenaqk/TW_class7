@@ -95,6 +95,13 @@ body{
   transform: translateY(-6px);
 }
 
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 20px;
+}
+
 /* Placeholder style if thumbnail missing */
 .thumb[alt=""]{
   background: linear-gradient(135deg,#222 0%, #111 100%);
