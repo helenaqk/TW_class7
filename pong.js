@@ -127,11 +127,11 @@ class Game {
         else this.p2Score++;
 
         if (this.p1Score == 3) {
-            statusEl.textContent = "Player wins!";
+            alert("You win!");
             this.p1Score = 0;
             this.p2Score = 0;
         } else if (this.p2Score == 3) {
-            statusEl.textContent = "Bot wins!";
+            alert("Bot wins!");
             this.p1Score = 0;
             this.p2Score = 0;
         }

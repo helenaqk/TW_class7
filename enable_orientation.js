@@ -1,10 +1,10 @@
-function handleOrientation(event) {
+window.handleOrientation = function(event) {
       // gamma: esquerda/direita, beta: frente/trás
       tiltX = event.gamma || 0;
       tiltY = event.beta || 0;
     }
 
-async function enableOrientation() {
+window.enableOrientation = async function() {
     try {
         if (typeof DeviceOrientationEvent !== "undefined" &&
             typeof DeviceOrientationEvent.requestPermission === "function") {
