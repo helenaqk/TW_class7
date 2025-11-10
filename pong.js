@@ -21,13 +21,13 @@ class Game {
         this.rad = this.deg * Math.PI / 180;
         this.index = Math.floor(Math.random() * 2);
         this.dir = this.direction[this.index];
-        this.ballSpeed = 0.004 * this.width;
+        this.ballSpeed = 0.002 * this.width;
         this.ballVelX = this.dir * 6 * Math.cos(this.rad);
         this.ballVelY = this.dir * 6 * Math.sin(this.rad);
 
         //  Paddles
-        this.paddleSpeed = 0.0125*this.height;
-        this.paddleWidth = 20;
+        this.paddleSpeed = 0.0095*this.height;
+        this.paddleWidth = 15;
         this.paddleHeight = 0.2*this.height;
         this.leftY = this.rightY = this.height / 2 - this.paddleHeight / 2;
         this.leftX = 100 - this.paddleWidth / 2;
@@ -50,9 +50,9 @@ class Game {
 
     update() {
         // Left paddle movement
-        if (this.keys["w"] || window.tiltX > window.X + 5) {
+        if (this.keys["w"] || window.tiltX > window.X + 7) {
             this.leftVel = -this.paddleSpeed;
-        } else if (this.keys["s"] || window.tiltX < window.X - 10){
+        } else if (this.keys["s"] || window.tiltX < window.X - 12){
             this.leftVel = this.paddleSpeed;
         } else {
             this.leftVel = 0;

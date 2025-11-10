@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech-Controlled Music Test</title>
+    <link rel="stylesheet" href="multimodal/style.css">
+    <style>
+        /* Additional styling for grid layout */
+        .song-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+
+        .song-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .song-button img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        #speech-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #1e1e1e;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🎵 Speech-Controlled Music Test 🎵</h1>
+
+    <div class="song-grid">
+        <div class="song-button">
+            <img src="https://images.genius.com/eb73d7d926fa4f76674778fd297804e9.1000x1000x1.jpg"
+                alt="505 by Arctic Monkeys" data-audio="songs/505.mp3">
+            <button>505</button>
+        </div>
+        <div class="song-button">
+            <img src="https://upload.wikimedia.org/wikipedia/en/6/6f/Huntr-x_-_Golden.png" alt="Golden by Huntrix"
+                data-audio="songs/golden.mp3">
+            <button>Golden</button>
+        </div>
+        <div class="song-button">
+            <img src="https://upload.wikimedia.org/wikipedia/en/7/71/Espresso_-_Sabrina_Carpenter.png"
+                alt="Espresso by Sabrinca Carpenter" data-audio="songs/espresso.mp3">
+            <button>Espresso</button>
+        </div>
+        <div class="song-button">
+            <img src="https://upload.wikimedia.org/wikipedia/en/6/61/Kendrick_Lamar_-_Not_Like_Us.png"
+                alt="Not Like Us by Kendrick Lamar" data-audio="songs/not_like_us.mp3">
+            <button>Not Like Us</button>
+        </div>
+    </div>
+
+    <audio id="player" controls style="width:100%; display:none;"></audio>
+
+    <div id="speech-box">🎤 Say "play", "pause", "fastforward", or "rewind" to control the song.</div>
+
+    <script>
+        const player = document.getElementById('player');
+        let currentAudio = null;
+
+        // Song selection
+        document.querySelectorAll('.song-button img, .song-button button').forEach(el => {
+            el.addEventListener('click', () => {
+                const audioSrc = el.dataset.audio || el.parentElement.querySelector('img').dataset.audio;
+                player.src = audioSrc;
+                player.play();
+                player.style.display = 'block';
+                currentAudio = audioSrc;
+            });
+        });
+
+        // Web Speech API
+        const speechBox = document.getElementById('speech-box');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = (event) => {
+                const lastResult = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                speechBox.textContent = `Heard: "${lastResult}"`;
+
+                if (!player.src) return;
+
+                if (lastResult.includes('play')) {
+                    player.play();
+                } else if (lastResult.includes('pause')) {
+                    player.pause();
+                } else if (lastResult.includes('fastforward')) {
+                    player.currentTime = Math.min(player.currentTime + 10, player.duration || player.currentTime);
+                } else if (lastResult.includes('rewind')) {
+                    player.currentTime = Math.max(player.currentTime - 10, 0);
+                }
+            };
+
+            recognition.onerror = (e) => {
+                speechBox.textContent = 'Speech recognition error: ' + e.error;
+            };
+        } else {
+            speechBox.textContent = '⚠️ Your browser does not support Web Speech API';
+        }
+    </script>
+</body>
