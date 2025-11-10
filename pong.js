@@ -1,8 +1,14 @@
 class Game {
     constructor(canvas) {
         this.ctx = canvas.getContext("2d");
-        canvas.height = window.innerWidth*0.80;
-        canvas.width = window.innerHeight*0.80;
+        if (window.innerWidth < window.innerHeight) {
+            canvas.height = window.innerWidth*0.90;
+            canvas.width = window.innerHeight*0.90;
+        } else if (window.innerWidth > window.innerHeight){
+            canvas.width = window.innerWidth*0.90;
+            canvas.height = window.innerHeight*0.90;
+        }
+
         this.width = canvas.width;
         this.height = canvas.height;
 
@@ -15,6 +21,7 @@ class Game {
         this.rad = this.deg * Math.PI / 180;
         this.index = Math.floor(Math.random() * 2);
         this.dir = this.direction[this.index];
+        this.ballSpeed = 0.004 * this.width;
         this.ballVelX = this.dir * 6 * Math.cos(this.rad);
         this.ballVelY = this.dir * 6 * Math.sin(this.rad);
 
@@ -55,9 +62,9 @@ class Game {
         const paddleCenter = this.rightY + this.paddleHeight / 2;
         const ballCenter = this.ballY;
 
-        if (ballCenter > paddleCenter + 15) {
+        if (ballCenter > paddleCenter + 20) {
             this.rightVel = this.paddleSpeed;
-        } else if (ballCenter < paddleCenter - 15) {
+        } else if (ballCenter < paddleCenter - 20) {
             this.rightVel = - this.paddleSpeed;
         } else {
             this.rightVel = 0;
@@ -179,4 +186,5 @@ function loop() {
 startBtn.addEventListener("click", () => {
         requestAnimationFrame(loop);
         enableOrientation();
+        document.getElementById("pong").scrollIntoView({ behavior: "smooth" });
     });
