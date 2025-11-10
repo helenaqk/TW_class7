@@ -37,11 +37,12 @@ body{
 .site-sub{margin:0;color:var(--muted);font-size:13px}
 
 /* Grid */
-.grid{
-  display:grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap:18px;
-  margin-top:20px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columns */
+  grid-template-rows: repeat(3, 1fr);    /* 3 rows (optional) */
+  gap: 18px;
+  margin-top: 20px;
 }
 
 /* Tile */
